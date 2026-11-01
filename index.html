@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customer Hisaab</title>
+<style>
+:root{--navy:#172b4d;--blue:#2855a6;--gold:#d6a84f;--bg:#f3f5f9;--ink:#202938;--muted:#6d7788;--line:#e2e7ef;--red:#bd3e42}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#142642,#294d83);color:#fff;padding:19px 16px}.head,.wrap{max-width:1050px;margin:auto}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:23px;margin:0 0 4px}.sub{font-size:12px;color:#d8e1f0}
+.wrap{padding:18px 13px}.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button{border:0;border-radius:8px;padding:10px 13px;font-weight:700;cursor:pointer;background:var(--blue);color:white}.secondary{background:#e8edf6;color:var(--navy)}.gold{background:var(--gold);color:#1d2a3e}.danger{background:#fff0f0;color:var(--red)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:15px;box-shadow:0 5px 18px #1c31500b}
+h2{font-size:18px;color:var(--navy);margin:0 0 15px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:var(--muted);font-weight:700}
+input,textarea{width:100%;min-width:0;border:1px solid #d9e0eb;border-radius:8px;padding:11px;font:inherit;color:var(--ink);background:#fff}textarea{min-height:65px}.full{grid-column:1/-1}
+.item-head,.item-row{display:grid;grid-template-columns:2fr .7fr .8fr .8fr 1fr auto;gap:8px;align-items:center}.item-head{font-size:12px;color:var(--muted);font-weight:bold;margin:12px 0 7px}.item-row{margin-bottom:8px}.item-row input{padding:9px}.item-amount{font-weight:bold;text-align:right;font-size:14px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.metric{background:#f5f7fb;border-radius:10px;padding:13px}.metric span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}.metric strong{font-size:19px}
+.note{font-size:12px;color:var(--muted);line-height:1.5}.hidden{display:none!important}.billrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.searchrow{display:flex;gap:8px;margin-bottom:12px}.searchrow input{flex:1}table{width:100%;border-collapse:collapse}th,td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{background:#f5f7fb;color:var(--muted)}.empty{text-align:center;padding:22px;color:var(--muted)}
+#billPreview{display:none}
+/* Shared print/export styling: kept outside @media print so PDF and photo capture render the same bill */
+.print-sheet{width:794px;min-height:1123px;padding:34px;color:#111;background:#fff;font-family:Arial,sans-serif;font-size:14px}
+.print-head{text-align:center;border-bottom:2px solid #222;padding:12px 12px 10px;margin-top:12px}
+.print-head h1{color:#111;margin:12px 0 0;font-size:23px}
+.meta{display:flex;justify-content:space-between;gap:10px;margin:14px 0;flex-wrap:wrap}
+.payment-box{border:1px solid #777;margin:25px auto;max-width:650px}
+.payment-box>div{display:flex;justify-content:space-between;gap:12px;padding:11px 15px;border-bottom:1px solid #ccc}
+.payment-box>div:last-child{border-bottom:0}
+.payment-box .final{border-top:1px solid #555;font-size:16px}
+.item-title{margin-top:25px;font-size:15px}
+.print-table{border-collapse:collapse;width:100%;margin-top:10px}
+.print-table th{background:#f3f3f3;color:#111;border:0;border-bottom:1px solid #777;text-align:left}
+.print-table td{border:0;border-bottom:1px solid #ddd;text-align:left}
+.print-table th,.print-table td{padding:8px 6px}
+@media(max-width:650px){.grid{grid-template-columns:1fr 1fr}.item-head,.item-row{grid-template-columns:1.4fr .6fr .7fr .7fr .9fr auto;gap:5px}.item-row input{padding:8px 5px;font-size:12px}.summary{grid-template-columns:1fr 1fr}.panel{padding:14px}}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.item-head{font-size:10px}.item-row input{font-size:11px}}
+@media print{.payment-box{border:1px solid #777;margin:25px auto;max-width:650px}.payment-box>div{display:flex;justify-content:space-between;gap:12px;padding:11px 15px;border-bottom:1px solid #ccc}.payment-box>div:last-child{border-bottom:0}.payment-box .final{border-top:1px solid #555;font-size:16px}.item-title{margin-top:25px;font-size:15px}.print-head{margin-top:12px;padding:12px}.print-head h1{margin-top:12px} body{background:#fff}.no-print,header,.tabs{display:none!important}.wrap{padding:0}#editorPanel,#historyPanel{display:none!important}#billPreview{display:block!important}.print-sheet{padding:9mm;color:#111}.print-head{text-align:center;border-bottom:2px solid #222;padding-bottom:10px}.print-head h1{color:#111}.meta{display:flex;justify-content:space-between;gap:10px;margin:14px 0}.print-table{border-collapse:collapse;width:100%;margin-top:10px}.print-table th{background:#f3f3f3!important;color:#111;border:0;border-bottom:1px solid #777;text-align:left}.print-table td{border:0;border-bottom:1px solid #ddd;text-align:left}.print-table th,.print-table td{padding:8px 6px}.totals{width:330px;max-width:100%;margin:14px 0 0 auto}.totals div{display:flex;justify-content:space-between;padding:7px;border-bottom:1px solid #aaa}.sign{display:flex;justify-content:space-between;margin-top:55px}}
+</style></head>
+<body>
+<header><div class="head"><div><h1>Customer Hisaab</h1><div class="sub">Bachat • Jama • Udhari Samaan</div></div><div class="sub">Offline • Is device mein save</div></div></header>
+<div class="wrap">
+<div class="tabs no-print"><button id="newTab" onclick="tab('edit')">＋ New Hisaab</button><button class="secondary" id="histTab" onclick="tab('history')">Saved Bills / History</button><button class="secondary" onclick="backup()">Backup Data</button><button class="secondary" onclick="$('restore').click()">Restore Backup</button><input id="restore" type="file" accept="application/json" class="hidden" onchange="restore(event)"></div>
+<section class="panel no-print" id="editor">
+<div class="billrow"><h2 id="formTitle">New Customer Hisaab</h2><span class="note" id="billLabel">Bill No: Auto</span></div>
+<div class="grid">
+<div class="field"><label>Customer Name *</label><input id="customer" placeholder="Customer name"></div>
+<div class="field"><label>Date</label><input id="date" type="date"></div>
+<div class="field"><label>Bill Number</label><input id="billNo" placeholder="Auto generated"></div>
+<div class="field"><label>Bachat (₹)</label><input id="oldBalance" type="number" step=".01" value="" onfocus="if(this.value==='0')this.value=''" oninput="calculate()"></div>
+<div class="field"><label>Jama (₹)</label><input id="jama" type="number" step=".01" value="" onfocus="if(this.value==='0')this.value=''" oninput="calculate()"></div><div class="field"><label>Udhari (₹)</label><input id="udhari" type="number" step=".01" value="" onfocus="if(this.value==='0')this.value=''" oninput="calculate()"></div>
+<div class="field"><label>Samaan ka Total (₹)</label><input id="goodsTotal" readonly value="0"></div>
+</div>
+<div style="margin-top:19px"><div class="billrow"><h2 style="margin:0">Nagad / Udhari Mein Liya Hua Samaan</h2><button type="button" onclick="addItem()">＋ Add Samaan</button></div>
+<div class="item-head"><span>Samaan ka naam</span><span>Qty</span><span>Rate (₹)</span><span>Discount %</span><span>Amount (₹)</span><span></span></div>
+<div id="items"></div>
+</div>
+<div class="field" style="margin-top:14px"><label>Remarks / Notes</label><textarea id="notes" placeholder="Extra details..."></textarea></div>
+<div class="summary"><div class="metric"><span>Bachat</span><strong id="oldShow">₹0.00</strong></div><div class="metric"><span>Is Baar Jama</span><strong id="jamaShow">₹0.00</strong></div><div class="metric"><span>Naya Balance / Bachat</span><strong id="newBalance">₹0.00</strong></div></div>
+<div class="actions" style="margin-top:17px"><button onclick="save()">Save Bill</button><button class="gold" onclick="printCurrent()">PDF / Print</button><button class="secondary" onclick="shareAsPdf()">Share PDF</button><button class="secondary" onclick="shareAsPhoto()">Share Photo</button><button class="secondary" onclick="resetForm()">Clear Form</button></div>
+<p class="note">Calculation: Naya Balance = Bachat + Udhari + Samaan Total − Jama.</p>
+</section>
+<section class="panel hidden no-print" id="history"><div class="billrow"><h2>Saved Bills</h2><span class="note" id="count">0 records</span></div><div class="searchrow"><input id="search" placeholder="Customer ya bill number search..." oninput="render()"></div><div id="list"></div></section>
+<section id="billPreview"><div class="print-sheet" id="printContent"></div></section>
+</div>
+<script>
+const KEY='customerHisaabV2';let data=JSON.parse(localStorage.getItem(KEY)||'[]'),editId=null;
+const $=id=>document.getElementById(id);const fmt=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+function billNum(){return 'CH-'+new Date().getFullYear()+'-'+Date.now().toString().slice(-6)}
+function addItem(item={name:'',qty:1,rate:0,discount:0}){const row=document.createElement('div');row.className='item-row';row.innerHTML=`<input class="iname" placeholder="Samaan ka naam"><input class="iqty" type="number" min="0" step="any" value="${item.qty}"><input class="irate" type="number" min="0" step="any" value="${item.rate}"><input class="idiscount" type="number" min="0" max="100" step="any" value="${item.discount||0}"><div class="item-amount">₹0.00</div><button class="danger" type="button" aria-label="Remove">×</button>`;row.querySelector('.iname').value=item.name||'';row.querySelectorAll('input').forEach(x=>x.addEventListener('input',calculate));row.querySelector('button').onclick=()=>{row.remove();calculate()};$('items').appendChild(row);calculate()}
+function itemData(){return [...$('items').children].map(row=>({name:row.querySelector('.iname').value.trim(),qty:+row.querySelector('.iqty').value||0,rate:+row.querySelector('.irate').value||0,discount:+row.querySelector('.idiscount').value||0,amount:(+row.querySelector('.iqty').value||0)*(+row.querySelector('.irate').value||0)*(1-(+row.querySelector('.idiscount').value||0)/100)}))}
+function calculate(){const its=itemData(),sum=its.reduce((a,x)=>a+x.amount,0),old=+$('oldBalance').value||0,j=+$('jama').value||0;its.forEach((x,i)=>$('items').children[i].querySelector('.item-amount').textContent=fmt(x.amount));$('goodsTotal').value=sum.toFixed(2);$('oldShow').textContent=fmt(old);$('jamaShow').textContent=fmt(j);$('newBalance').textContent=fmt(old+sum+(+$('udhari').value||0)-j)}
+function tab(which){$('editor').classList.toggle('hidden',which!=='edit');$('history').classList.toggle('hidden',which!=='history');$('newTab').className=which==='edit'?'':'secondary';$('histTab').className=which==='history'?'':'secondary';if(which==='history')render()}
+function formData(){const items=itemData(),old=+$('oldBalance').value||0,j=+$('jama').value||0;return{id:editId||String(Date.now()),customer:$('customer').value.trim(),date:$('date').value,billNo:$('billNo').value.trim()||billNum(),oldBalance:old,jama:j,udhari:+$('udhari').value||0,nagadi:0,items,goodsTotal:items.reduce((a,x)=>a+x.amount,0),newBalance:old+items.reduce((a,x)=>a+x.amount,0)+(+$('udhari').value||0)-j,notes:$('notes').value.trim()}}
+function save(){const r=formData();if(!r.customer){alert('Customer name bharo.');return}if(editId)data=data.map(x=>x.id===editId?r:x);else data.unshift(r);localStorage.setItem(KEY,JSON.stringify(data));alert('Hisaab save ho gaya.');resetForm();tab('history')}
+function resetForm(){editId=null;['customer','billNo','notes'].forEach(x=>$(x).value='');$('oldBalance').value='';$('jama').value='';$('udhari').value='';$('date').value=new Date().toISOString().slice(0,10);$('items').innerHTML='';addItem();$('formTitle').textContent='New Customer Hisaab';$('billLabel').textContent='Bill No: Auto';calculate()}
+function edit(id){const r=data.find(x=>x.id===id);if(!r)return;editId=id;$('customer').value=r.customer;$('date').value=r.date;$('billNo').value=r.billNo;$('oldBalance').value=r.oldBalance;$('jama').value=r.jama;$('udhari').value=(Number(r.udhari)||0)+(Number(r.nagadi)||0);$('notes').value=r.notes||'';$('items').innerHTML='';(r.items||[]).forEach(x=>addItem(x));if(!r.items?.length)addItem();$('formTitle').textContent='Edit Customer Hisaab';$('billLabel').textContent='Bill No: '+r.billNo;tab('edit');calculate()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){const q=$('search').value.toLowerCase(),rows=data.filter(r=>(r.customer+' '+r.billNo).toLowerCase().includes(q));$('count').textContent=rows.length+' records';$('list').innerHTML=rows.length?`<table><thead><tr><th>Bill / Date</th><th>Customer</th><th>Bachat</th><th>Jama</th><th>Naya Balance</th><th>Action</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.billNo)}<br>${esc(r.date)}</td><td>${esc(r.customer)}</td><td>${fmt(r.oldBalance)}</td><td>${fmt(r.jama)}</td><td>${fmt(r.newBalance)}</td><td><button class="secondary" onclick="edit('${r.id}')">Edit</button> <button class="gold" onclick="printSaved('${r.id}')">PDF</button> <button class="danger" onclick="del('${r.id}')">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Koi saved bill nahi mila.</div>'}
+function del(id){if(confirm('Is bill ko delete karein?')){data=data.filter(x=>x.id!==id);localStorage.setItem(KEY,JSON.stringify(data));render()}}
+function printData(r){
+ const items=(r.items||[]).filter(x=>x.name&&x.name.trim());
+ const rows=items.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${x.qty}</td><td>${fmt(x.rate)}</td><td>${x.discount||0}%</td><td>${fmt(x.amount)}</td></tr>`).join('');
+ const old=Number(r.oldBalance)||0, udhari=Number(r.udhari)||0, nagadi=Number(r.nagadi)||0, goods=Number(r.goodsTotal)||0, jama=Number(r.jama)||0;
+ const subTotal=old-jama;
+ const totalUdhari=udhari+nagadi+goods;
+ const finalTotal=subTotal+totalUdhari;
+ const summaryRows=[
+  `<div><span>बचत</span><b>+ ${fmt(old)}</b></div>`,
+  `<div><span>जमा</span><b>− ${fmt(jama)}</b></div>`,
+  `<div><span>Sub-Total</span><b>${fmt(subTotal)}</b></div>`,
+  `<div><span>उधारी</span><b>+ ${fmt(totalUdhari)}</b></div>`,
+  `<div class="final"><b>Total</b><b>${fmt(finalTotal)}</b></div>`
+ ].join('');
+ const remarks=r.notes&&r.notes.trim()?`<p><b>Remarks:</b> ${esc(r.notes)}</p>`:'';
+ $('printContent').innerHTML=`<div class="print-head"><div>॥ जय श्री राम ॥</div><h1>PAYMENT SUMMARY</h1></div><div class="meta"><span><b>Customer:</b> ${esc(r.customer)}</span><span><b>Bill:</b> ${esc(r.billNo)}</span><span><b>Date:</b> ${esc(r.date)}</span></div><div class="payment-box">${summaryRows}</div>${rows?`<h3 class="item-title">Samaan Details</h3><table class="print-table"><thead><tr><th>#</th><th>Samaan</th><th>Qty</th><th>Rate</th><th>Discount</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table>`:''}${remarks}`;
+}
+function printCurrent(){const r=formData();if(!r.customer){alert('Customer name bharo.');return}printData(r);window.print()}
+function printSaved(id){const r=data.find(x=>x.id===id);if(r){printData(r);window.print()}}
+
+let html2canvasReady=null;
+function loadHtml2Canvas(){
+ if(window.html2canvas)return Promise.resolve(window.html2canvas);
+ if(html2canvasReady)return html2canvasReady;
+ html2canvasReady=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');
+  script.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  script.onload=()=>window.html2canvas?resolve(window.html2canvas):reject(new Error('Library unavailable'));
+  script.onerror=()=>reject(new Error('Could not load image exporter'));
+  document.head.appendChild(script);
+ });
+ return html2canvasReady;
+}
+function safeFilePart(s){return String(s||'Customer').trim().replace(/[\/\\:*?"<>|]/g,'-').replace(/\s+/g,'-')}
+function outputFileBase(r){
+ const p=(r.date||'').split('-');
+ const d=p.length===3?`${Number(p[2])}-${Number(p[1])}`:(r.date||'Date');
+ return `${safeFilePart(r.customer)}-${d}-${safeFilePart(r.billNo)}`;
+}
+async function capturePrintCanvas(r){
+ printData(r);
+ const host=$('billPreview'),node=$('printContent');
+ const prevHost={display:host.style.display,position:host.style.position,left:host.style.left,top:host.style.top,width:host.style.width,zIndex:host.style.zIndex,background:host.style.background};
+ const prevNode={position:node.style.position,left:node.style.left,top:node.style.top,width:node.style.width,display:node.style.display,background:node.style.background,zIndex:node.style.zIndex};
+ // The preview's parent is normally display:none; revealing only its child still produces a blank canvas.
+ host.style.display='block';host.style.position='fixed';host.style.left='0';host.style.top='0';host.style.width='794px';host.style.zIndex='2147483000';host.style.background='#fff';
+ node.style.display='block';node.style.position='relative';node.style.left='0';node.style.top='0';node.style.width='794px';node.style.background='#fff';node.style.zIndex='auto';
+ try{
+  const exporter=await loadHtml2Canvas();
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const canvas=await exporter(node,{backgroundColor:'#ffffff',scale:2,useCORS:true,logging:false,windowWidth:900,windowHeight:Math.max(1200,node.scrollHeight),scrollX:0,scrollY:0});
+  if(!canvas.width||!canvas.height)throw new Error('Empty bill image');
+  return canvas;
+ }finally{Object.assign(host.style,prevHost);Object.assign(node.style,prevNode)}
+}
+function canvasToPdf(canvas){
+ const dataUrl=canvas.toDataURL('image/jpeg',0.96),raw=atob(dataUrl.split(',')[1]),bytes=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+ const w=595,h=Math.round(595*canvas.height/canvas.width),enc=new TextEncoder(),parts=[],off=[0];let len=0;
+ const add=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length};
+ add('%PDF-1.4\n');
+ const obj=(n,s)=>{off[n]=len;add(n+' 0 obj\n'+s+'\nendobj\n')};
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+ obj(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+ obj(3,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
+ off[4]=len;add(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bytes.length} >>\nstream\n`);add(bytes);add('\nendstream\nendobj\n');
+ const st=`q\n${w} 0 0 ${h} 0 0 cm\n/Im0 Do\nQ`;obj(5,`<< /Length ${st.length} >>\nstream\n${st}\nendstream`);
+ const x=len;add('xref\n0 6\n0000000000 65535 f \n');for(let i=1;i<=5;i++)add(String(off[i]).padStart(10,'0')+' 00000 n \n');add(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`);
+ return new Blob(parts,{type:'application/pdf'});
+}
+async function shareOutput(blob,name,title){
+ const file=new File([blob],name,{type:blob.type});
+ if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+  await navigator.share({title,files:[file]});
+ }else{
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000);
+  alert('Is browser mein direct sharing available nahi hai. File download ho gayi hai; WhatsApp mein attach karke bhej sakte ho.');
+ }
+}
+async function shareAsPdf(){
+ const r=formData();if(!r.customer){alert('Customer name bharo.');return}
+ try{const canvas=await capturePrintCanvas(r);await shareOutput(canvasToPdf(canvas),outputFileBase(r)+'.pdf','Customer Hisaab PDF')}
+ catch(e){if(e&&e.name==='AbortError')return;alert('Share PDF nahi ban paya. '+(e&&e.message?e.message:'Dobara try karo.'))}
+}
+async function shareAsPhoto(){
+ const r=formData();if(!r.customer){alert('Customer name bharo.');return}
+ try{const canvas=await capturePrintCanvas(r);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('Photo export failed');await shareOutput(blob,outputFileBase(r)+'.png','Customer Hisaab Photo')}
+ catch(e){if(e&&e.name==='AbortError')return;alert('Share Photo nahi ban payi. '+(e&&e.message?e.message:'Dobara try karo.'))}
+}
+function backup(){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=u;a.download='customer-hisaab-backup.json';a.click();URL.revokeObjectURL(u)}
+function restore(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const incoming=JSON.parse(rd.result);if(!Array.isArray(incoming))throw 0;if(confirm('Backup data import karein? Same ID wale records update honge.')){const m=new Map(data.map(x=>[x.id,x]));incoming.forEach(x=>m.set(x.id,x));data=[...m.values()];localStorage.setItem(KEY,JSON.stringify(data));render();alert('Backup restore ho gaya.')}}catch{alert('Backup file valid nahi hai.')}e.target.value=''};rd.readAsText(f)}
+resetForm();render();loadHtml2Canvas().catch(()=>{});
+</script></body></html>
