@@ -6,6 +6,7 @@ import android.content.Context;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
 import android.print.PrintDocumentAdapter;
+import android.webkit.WebSettings;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -22,10 +23,25 @@ public class MainActivity extends Activity {
         webView = new WebView(this);
         setContentView(webView);
 
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setAllowContentAccess(true);
+        WebSettings settings = webView.getSettings();
+
+settings.setJavaScriptEnabled(true);
+settings.setDomStorageEnabled(true);
+settings.setDatabaseEnabled(true);
+settings.setAllowFileAccess(true);
+settings.setAllowContentAccess(true);
+
+// Desktop mode ON by default
+settings.setUseWideViewPort(true);
+settings.setLoadWithOverviewMode(true);
+settings.setSupportZoom(true);
+settings.setBuiltInZoomControls(true);
+settings.setDisplayZoomControls(false);
+
+settings.setUserAgentString(
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
+    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+);
 
         webView.setWebChromeClient(new WebChromeClient());
 
