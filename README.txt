@@ -1,15 +1,24 @@
-CUSTOMER HISAAB ANDROID APP
+CUSTOMER HISAAB ANDROID APP — V2
 
-This project wraps the V12 website in an Android WebView and stores browser localStorage on the device.
-The website is bundled in app/src/main/assets/index.html, so core entry/history works offline.
-Printing is configured for actual A5 landscape paper through Android PrintManager.
+This is a complete Android Studio/Gradle project. It wraps the V12 Customer Hisaab website in an Android WebView.
+The website is bundled at app/src/main/assets/index.html, so customer entry and saved history remain on-device and core use works offline.
+Android printing is configured for physical A5 landscape paper.
 
-GITHUB UPLOAD:
-Upload the CONTENTS of this folder into the root of your existing customer-hisaab repository, merging with the existing website files. Do not delete the website files.
+UPLOAD TO YOUR EXISTING GITHUB REPOSITORY:
+1. Extract this ZIP.
+2. Upload the CONTENTS of the extracted folder to the ROOT of the existing customer-hisaab repository.
+3. Choose the option to replace the existing .github/workflows/build-apk.yml if GitHub asks.
+4. Keep the existing root website index.html; do not delete it. The Android app uses its own bundled copy at app/src/main/assets/index.html.
+5. Commit the upload.
 
-BUILD APK:
-After committing, open repository > Actions > Build Customer Hisaab APK > Run workflow.
-When green, open the run > Artifacts > Customer-Hisaab-APK and download app-debug.apk.
-Install the APK on your Android phone. Allow installation from this source if Android asks.
+BUILD:
+1. Open repository > Actions > Build Customer Hisaab APK.
+2. Select Run workflow if it does not start automatically.
+3. Wait for the green successful run.
+4. Open the run and download the Customer-Hisaab-APK artifact.
+5. Extract the artifact ZIP to get app-debug.apk and install it on the Android phone.
 
-Note: Share Photo/PDF uses the website's existing html2canvas CDN loader; those export/share features need internet the first time the library is fetched. Core entry and saved history are local/offline.
+IMPORTANT:
+- This package includes the complete Gradle project and a corrected GitHub Actions workflow.
+- The workflow deliberately does not use android-actions/setup-android, which caused the previous "Failed to find package 'tools'" error.
+- Share Photo/PDF in the current website may fetch html2canvas from a CDN; that export helper needs internet on first fetch. Normal entry and local history are bundled/local.
